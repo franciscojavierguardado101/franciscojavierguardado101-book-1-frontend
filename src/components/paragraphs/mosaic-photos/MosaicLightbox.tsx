@@ -46,24 +46,14 @@ export default function MosaicLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col md:flex-row"
+      className="fixed inset-0 z-50 flex"
       style={{ background: "rgba(0,0,0,0.92)" }}
       role="dialog"
       aria-modal="true"
       aria-label={card.title}
     >
-      {/* Close — anchored to top-right of the full modal at all breakpoints */}
-      <button
-        onClick={onClose}
-        aria-label="Close"
-        className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center transition-opacity hover:opacity-70 focus:outline-none"
-        style={{ color: "#fff", fontFamily: "var(--font-header)", fontSize: 20 }}
-      >
-        ×
-      </button>
-
-      {/* Image area — full width / 50 vh on mobile; fills remaining width on desktop */}
-      <div className="relative flex items-center justify-center min-w-0 h-[50vh] md:h-auto md:flex-1">
+      {/* Image area */}
+      <div className="relative flex-1 flex items-center justify-center min-w-0">
         {/* Prev arrow */}
         <button
           onClick={goPrev}
@@ -77,10 +67,7 @@ export default function MosaicLightbox({
         </button>
 
         {/* Image */}
-        <div
-          className="relative w-full h-full max-w-[calc(100%-120px)]"
-          style={{ maxHeight: "90vh" }}
-        >
+        <div className="relative w-full h-full max-w-[calc(100%-120px)]" style={{ maxHeight: "90vh" }}>
           {card.mediaType === "image" ? (
             <Image
               key={card.id}
@@ -113,16 +100,28 @@ export default function MosaicLightbox({
         </button>
       </div>
 
-      {/* Details panel — full width / flex-1 on mobile; fixed 300 px sidebar on desktop */}
+      {/* Details panel */}
       <div
-        className="flex flex-col overflow-y-auto flex-1 border-t md:border-t-0 md:flex-none md:w-[300px] md:shrink-0 md:border-l"
+        className="flex flex-col overflow-y-auto"
         style={{
+          width: 300,
+          flexShrink: 0,
           background: "var(--color-surface)",
-          borderColor: "var(--color-border)",
-          padding: "20px 28px 28px",
+          borderLeft: "1px solid var(--color-border)",
+          padding: "48px 28px 28px",
           position: "relative",
         }}
       >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center transition-opacity hover:opacity-70 focus:outline-none"
+          style={{ color: "#fff", fontFamily: "var(--font-header)", fontSize: 20 }}
+        >
+          ×
+        </button>
+
         {/* Counter */}
         <p
           style={{

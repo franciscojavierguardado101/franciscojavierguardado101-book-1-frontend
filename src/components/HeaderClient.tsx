@@ -57,10 +57,59 @@ export default function HeaderClient({ navItems }: HeaderClientProps) {
 
         {/* Icons */}
         <div className="flex items-center gap-4">
+          {/* Desktop: search pill */}
           <button
             aria-label="Search"
             onClick={() => setSearchOpen(true)}
-            className="text-white hover:opacity-60 transition-opacity"
+            className="hidden md:flex items-center gap-2 transition-colors focus:outline-none group"
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid var(--color-border)",
+              borderRadius: 6,
+              padding: "6px 10px",
+              cursor: "pointer",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.09)")}
+            onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+          >
+            <svg width="14" height="14" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: "var(--color-muted)", flexShrink: 0 }}>
+              <circle cx="28.58" cy="28.58" r="18.58" />
+              <line x1="41.94" y1="42" x2="54" y2="54" />
+            </svg>
+            <span
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: 12,
+                letterSpacing: "0.05em",
+                color: "var(--color-muted)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Search…
+            </span>
+            <kbd
+              style={{
+                fontFamily: "var(--font-header)",
+                fontSize: 10,
+                letterSpacing: "0.04em",
+                color: "var(--color-muted)",
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid var(--color-border)",
+                borderRadius: 3,
+                padding: "1px 5px",
+                marginLeft: 6,
+                opacity: 0.7,
+              }}
+            >
+              ⌘K
+            </kbd>
+          </button>
+
+          {/* Mobile: icon only */}
+          <button
+            aria-label="Search"
+            onClick={() => setSearchOpen(true)}
+            className="md:hidden text-white hover:opacity-60 transition-opacity"
           >
             <svg width="20" height="20" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="28.58" cy="28.58" r="18.58" />
