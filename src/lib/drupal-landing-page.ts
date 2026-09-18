@@ -1,6 +1,8 @@
 import type { CarouselCardData, ArtPosition, ButtonColor } from "@/components/paragraphs/carousel-hero";
 import type { MosaicPhotoCardData } from "@/components/paragraphs/mosaic-photos";
 import type { FeatureSpotData, FeatureSpotPosition, FeatureSpotBgColor } from "@/components/paragraphs/feature-spot";
+import type { SpaceCalendarData } from "@/components/paragraphs/space-calendar";
+import type { DescriptiveContentData } from "@/components/paragraphs/descriptive-content";
 
 const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
@@ -38,12 +40,26 @@ export type ParagraphFeatureSpot = {
   data: FeatureSpotData;
 };
 
+export type ParagraphSpaceCalendar = {
+  type: "paragraph--space_calendar";
+  id: string;
+  heading?: string;
+};
+
+export type ParagraphDescriptiveContent = {
+  type: "paragraph--descriptive_content";
+  id: string;
+  data: DescriptiveContentData;
+};
+
 export type ParagraphData =
   | ParagraphCarouselHero
   | ParagraphViewEmbed
   | ParagraphRichText
   | ParagraphMosaicPhotos
-  | ParagraphFeatureSpot;
+  | ParagraphFeatureSpot
+  | ParagraphSpaceCalendar
+  | ParagraphDescriptiveContent;
 
 // ─── JSON:API helpers ─────────────────────────────────────────────────────────
 
@@ -78,13 +94,14 @@ const INCLUDE_FEATURE_SPOT = [
   "field_components.field_feat_spot_image.field_media_image",
 ].join(",");
 
-// ─── Main fetcher ─────────────────────────────────────────────────────────────
+// ─── Shared fetcher (any node type using field_components) ───────────────────
 
-export async function getLandingPageComponents(
+export async function getNodeComponents(
+  nodeType: string,
   nodeUuid: string,
 ): Promise<ParagraphData[]> {
   // First pass: base includes (always works)
-  const baseUrl = `${DRUPAL_BASE}/jsonapi/node/landing_page/${nodeUuid}?include=${INCLUDE_BASE}`;
+  const baseUrl = `${DRUPAL_BASE}/jsonapi/node/${nodeType}/${nodeUuid}?include=${INCLUDE_BASE}`;
   const baseRes = await fetch(baseUrl, {
     headers: { Accept: "application/vnd.api+json" },
     next: { revalidate: 60 },
@@ -105,7 +122,7 @@ export async function getLandingPageComponents(
     const extras: string[] = [INCLUDE_BASE];
     if (hasMosaic) extras.push(INCLUDE_MOSAIC);
     if (hasFeatureSpot) extras.push(INCLUDE_FEATURE_SPOT);
-    const fullUrl = `${DRUPAL_BASE}/jsonapi/node/landing_page/${nodeUuid}?include=${extras.join(",")}`;
+    const fullUrl = `${DRUPAL_BASE}/jsonapi/node/${nodeType}/${nodeUuid}?include=${extras.join(",")}`;
     const fullRes = await fetch(fullUrl, {
       headers: { Accept: "application/vnd.api+json" },
       next: { revalidate: 60 },
@@ -129,9 +146,18 @@ export async function getLandingPageComponents(
         const p = parseFeatureSpot(ref.id, included);
         return p ? [p] : [];
       }
+      case "paragraph--space_calendar":
+        return [parseSpaceCalendar(ref.id, included)];
+      case "paragraph--descriptive_content":
+        return [parseDescriptiveContent(ref.id, included)];
       default: return [];
     }
   });
+}
+
+// Kept for backwards compatibility — homepage still calls this directly.
+export function getLandingPageComponents(nodeUuid: string): Promise<ParagraphData[]> {
+  return getNodeComponents("landing_page", nodeUuid);
 }
 
 // ─── Paragraph parsers ────────────────────────────────────────────────────────
@@ -396,5 +422,43 @@ function parseFeatureSpot(id: string, included: AnyResource[]): ParagraphFeature
     type: "paragraph--feature_spot",
     id,
     data: { id, title, description, linkHref, linkLabel, imageUrl, imageAlt, position, bgColor },
+  };
+}
+
+function parseSpaceCalendar(id: string, included: AnyResource[]): ParagraphSpaceCalendar {
+  type ApiSpaceCalendar = AnyResource & {
+    attributes: { field_sc_label: string | null };
+  };
+
+  const para = findIncluded<ApiSpaceCalendar>(included, "paragraph--space_calendar", id);
+  return {
+    type: "paragraph--space_calendar",
+    id,
+    heading: para?.attributes.field_sc_label ?? undefined,
+  };
+}
+
+function parseDescriptiveContent(id: string, included: AnyResource[]): ParagraphDescriptiveContent {
+  type ApiDescriptiveContent = AnyResource & {
+    attributes: {
+      field_descript_c_title: string | null;
+      field_descript_c_descript: { processed?: string; value?: string } | null;
+    };
+  };
+
+  const para = findIncluded<ApiDescriptiveContent>(included, "paragraph--descriptive_content", id);
+  const description =
+    para?.attributes.field_descript_c_descript?.processed ??
+    para?.attributes.field_descript_c_descript?.value ??
+    undefined;
+
+  return {
+    type: "paragraph--descriptive_content",
+    id,
+    data: {
+      id,
+      title: para?.attributes.field_descript_c_title ?? undefined,
+      description,
+    },
   };
 }

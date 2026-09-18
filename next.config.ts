@@ -24,11 +24,6 @@ const nextConfig: NextConfig = {
         port: "33300",
         pathname: "/sites/default/files/**",
       },
-      {
-        protocol: "https",
-        hostname: "dev-francisco-guardado-book-1.pantheonsite.io",
-        pathname: "/sites/default/files/**",
-      },
     ],
   },
 };

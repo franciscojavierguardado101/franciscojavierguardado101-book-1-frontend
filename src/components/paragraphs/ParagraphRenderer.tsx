@@ -3,6 +3,8 @@ import { CarouselHero } from "@/components/paragraphs/carousel-hero";
 import ViewEmbed from "@/components/paragraphs/view-embed/ViewEmbed";
 import { MosaicPhotos } from "@/components/paragraphs/mosaic-photos";
 import { FeatureSpot } from "@/components/paragraphs/feature-spot";
+import { SpaceCalendar } from "@/components/paragraphs/space-calendar";
+import { DescriptiveContent } from "@/components/paragraphs/descriptive-content";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -22,5 +24,11 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--feature_spot":
       return <FeatureSpot data={paragraph.data} />;
+
+    case "paragraph--space_calendar":
+      return <SpaceCalendar heading={paragraph.heading} />;
+
+    case "paragraph--descriptive_content":
+      return <DescriptiveContent data={paragraph.data} />;
   }
 }
