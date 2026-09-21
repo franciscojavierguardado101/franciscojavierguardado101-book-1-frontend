@@ -3,6 +3,7 @@ import type { MosaicPhotoCardData } from "@/components/paragraphs/mosaic-photos"
 import type { FeatureSpotData, FeatureSpotPosition, FeatureSpotBgColor } from "@/components/paragraphs/feature-spot";
 import type { SpaceCalendarData } from "@/components/paragraphs/space-calendar";
 import type { DescriptiveContentData } from "@/components/paragraphs/descriptive-content";
+import type { EarthquakeDashboardData, TimeRange } from "@/components/paragraphs/earthquake-dashboard";
 
 const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
@@ -52,6 +53,12 @@ export type ParagraphDescriptiveContent = {
   data: DescriptiveContentData;
 };
 
+export type ParagraphEarthquakeDashboard = {
+  type: "paragraph--earthquake_dashboard";
+  id: string;
+  data: EarthquakeDashboardData;
+};
+
 export type ParagraphData =
   | ParagraphCarouselHero
   | ParagraphViewEmbed
@@ -59,7 +66,8 @@ export type ParagraphData =
   | ParagraphMosaicPhotos
   | ParagraphFeatureSpot
   | ParagraphSpaceCalendar
-  | ParagraphDescriptiveContent;
+  | ParagraphDescriptiveContent
+  | ParagraphEarthquakeDashboard;
 
 // ─── JSON:API helpers ─────────────────────────────────────────────────────────
 
@@ -150,6 +158,8 @@ export async function getNodeComponents(
         return [parseSpaceCalendar(ref.id, included)];
       case "paragraph--descriptive_content":
         return [parseDescriptiveContent(ref.id, included)];
+      case "paragraph--earthquake_dashboard":
+        return [parseEarthquakeDashboard(ref.id, included)];
       default: return [];
     }
   });
@@ -459,6 +469,30 @@ function parseDescriptiveContent(id: string, included: AnyResource[]): Paragraph
       id,
       title: para?.attributes.field_descript_c_title ?? undefined,
       description,
+    },
+  };
+}
+
+function parseEarthquakeDashboard(id: string, included: AnyResource[]): ParagraphEarthquakeDashboard {
+  type ApiEarthquakeDashboard = AnyResource & {
+    attributes: {
+      field_eq_label: string | null;
+      field_eq_default_range: string | null;
+    };
+  };
+
+  const para = findIncluded<ApiEarthquakeDashboard>(included, "paragraph--earthquake_dashboard", id);
+  const validRanges = new Set(["hour", "day", "week", "month"]);
+  const rawRange = para?.attributes.field_eq_default_range ?? null;
+  const defaultRange = rawRange && validRanges.has(rawRange) ? (rawRange as TimeRange) : undefined;
+
+  return {
+    type: "paragraph--earthquake_dashboard",
+    id,
+    data: {
+      id,
+      heading: para?.attributes.field_eq_label ?? undefined,
+      defaultRange,
     },
   };
 }

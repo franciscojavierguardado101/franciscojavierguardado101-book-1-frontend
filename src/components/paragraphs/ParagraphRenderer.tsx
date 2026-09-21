@@ -5,6 +5,7 @@ import { MosaicPhotos } from "@/components/paragraphs/mosaic-photos";
 import { FeatureSpot } from "@/components/paragraphs/feature-spot";
 import { SpaceCalendar } from "@/components/paragraphs/space-calendar";
 import { DescriptiveContent } from "@/components/paragraphs/descriptive-content";
+import { EarthquakeDashboard } from "@/components/paragraphs/earthquake-dashboard";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -30,5 +31,8 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--descriptive_content":
       return <DescriptiveContent data={paragraph.data} />;
+
+    case "paragraph--earthquake_dashboard":
+      return <EarthquakeDashboard data={paragraph.data} />;
   }
 }
