@@ -39,18 +39,28 @@ export default function EarthquakeDashboard({ data }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const USGS_URLS: Record<TimeRange, string> = {
+    hour: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson",
+    day: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson",
+    week: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson",
+    month: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson",
+  };
+
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/earthquake-events?range=${range}`)
+    fetch(USGS_URLS[range])
       .then((r) => r.json())
       .then((json) => {
-        if (json.error) {
-          setError(json.error);
-          setFeatures([]);
-        } else {
-          setFeatures(json.features ?? []);
-        }
+        const mapped = (json.features ?? []).map((f: any) => ({
+          id: f.id,
+          mag: f.properties.mag,
+          place: f.properties.place,
+          time: f.properties.time,
+          depth: f.geometry.coordinates[2],
+          url: f.properties.url,
+        }));
+        setFeatures(mapped);
       })
       .catch(() => setError("Failed to load earthquake data."))
       .finally(() => setLoading(false));

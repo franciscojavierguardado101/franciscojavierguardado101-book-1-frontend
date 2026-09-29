@@ -6,6 +6,7 @@ import { FeatureSpot } from "@/components/paragraphs/feature-spot";
 import { SpaceCalendar } from "@/components/paragraphs/space-calendar";
 import { DescriptiveContent } from "@/components/paragraphs/descriptive-content";
 import { EarthquakeDashboard } from "@/components/paragraphs/earthquake-dashboard";
+import { ApodDisplay } from "@/components/paragraphs/apod";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -34,5 +35,8 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--earthquake_dashboard":
       return <EarthquakeDashboard data={paragraph.data} />;
+
+    case "paragraph--apod":
+      return <ApodDisplay heading={paragraph.data.heading} />;
   }
 }

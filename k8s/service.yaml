@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: book1-frontend-service
+  namespace: default
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
+spec:
+  type: LoadBalancer
+  selector:
+    app: book1-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: pod-masq-fix
+  namespace: kube-system
+  labels:
+    app: pod-masq-fix
+spec:
+  selector:
+    matchLabels:
+      app: pod-masq-fix
+  template:
+    metadata:
+      labels:
+        app: pod-masq-fix
+    spec:
+      hostNetwork: true
+      tolerations:
+        - operator: Exists
+      initContainers:
+        - name: masq-fix
+          image: alpine:3.18
+          securityContext:
+            privileged: true
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add -q iptables
+              OUTBOUND_IF=$(ip route | grep '^default' | awk '{print $5}' | head -1)
+              NODE_IP=$(ip -4 addr show "$OUTBOUND_IF" | grep -oP '(?<=inet )\d+\.\d+\.\d+\.\d+' | head -1)
+              echo "Node: $NODE_IP via $OUTBOUND_IF"
+              iptables -t nat -C POSTROUTING -o "$OUTBOUND_IF" ! -s "$NODE_IP"/32 -j MASQUERADE 2>/dev/null \
+                || iptables -t nat -A POSTROUTING -o "$OUTBOUND_IF" ! -s "$NODE_IP"/32 -j MASQUERADE
+              echo "Done"
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.9
+          resources:
+            limits:
+              cpu: "10m"
+              memory: "16Mi"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { MosaicPhotosData, MosaicPhotoCardData } from "./types";
 import MosaicLightbox from "./MosaicLightbox";
@@ -41,10 +41,12 @@ function getGridPlacement(index: number): {
 function MosaicCell({
   card,
   index,
+  isMobile,
   onClick,
 }: {
   card: MosaicPhotoCardData;
   index: number;
+  isMobile: boolean;
   onClick: () => void;
 }) {
   const { gridColumn, gridRow } = getGridPlacement(index);
@@ -53,7 +55,11 @@ function MosaicCell({
     <button
       onClick={onClick}
       className="group relative block overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-      style={{ gridColumn, gridRow, background: "var(--color-surface)" }}
+      style={{
+        gridColumn: isMobile ? undefined : gridColumn,
+        gridRow: isMobile ? undefined : gridRow,
+        background: "var(--color-surface)",
+      }}
       aria-label={`View photo: ${card.title}`}
     >
       {/* Image */}
@@ -126,6 +132,15 @@ function SectionHeader({ heading }: { heading: string }) {
 
 export default function MosaicPhotos({ heading = "Photos", cards }: MosaicPhotosData) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   if (!cards.length) return null;
 
@@ -137,8 +152,8 @@ export default function MosaicPhotos({ heading = "Photos", cards }: MosaicPhotos
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gridAutoRows: "225px",
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
+            gridAutoRows: isMobile ? "160px" : "225px",
             gap: "15px",
           }}
         >
@@ -147,6 +162,7 @@ export default function MosaicPhotos({ heading = "Photos", cards }: MosaicPhotos
               key={card.id}
               card={card}
               index={i}
+              isMobile={isMobile}
               onClick={() => setLightboxIndex(i)}
             />
           ))}

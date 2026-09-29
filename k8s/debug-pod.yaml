@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: masq-debug
+  namespace: kube-system
+spec:
+  hostNetwork: true
+  restartPolicy: Never
+  containers:
+    - name: masq-debug
+      image: alpine:3.18
+      securityContext:
+        privileged: true
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          apk add -q iptables
+          echo "=== POSTROUTING RULES ==="
+          iptables -t nat -S POSTROUTING
+          echo "=== ROUTING TABLE ==="
+          ip route
+          echo "=== TCP TEST to 8.8.8.8:443 ==="
+          nc -zw3 8.8.8.8 443 && echo "TCP_OK" || echo "TCP_FAIL"
+          echo "=== TCP TEST to 93.184.216.34:443 (example.com) ==="
+          nc -zw3 93.184.216.34 443 && echo "TCP_OK" || echo "TCP_FAIL"

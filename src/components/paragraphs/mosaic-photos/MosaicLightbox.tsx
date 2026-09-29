@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import Image from "next/image";
 import type { MosaicPhotoCardData } from "./types";
 
@@ -20,6 +20,8 @@ export default function MosaicLightbox({
   const card = cards[activeIndex];
   const total = cards.length;
 
+  const [isMobile, setIsMobile] = useState(false);
+
   const goPrev = useCallback(() => {
     onNavigate((activeIndex - 1 + total) % total);
   }, [activeIndex, total, onNavigate]);
@@ -27,6 +29,14 @@ export default function MosaicLightbox({
   const goNext = useCallback(() => {
     onNavigate((activeIndex + 1) % total);
   }, [activeIndex, total, onNavigate]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -46,14 +56,25 @@ export default function MosaicLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex"
-      style={{ background: "rgba(0,0,0,0.92)" }}
+      className="fixed inset-0 z-50"
+      style={{
+        background: "rgba(0,0,0,0.92)",
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+      }}
       role="dialog"
       aria-modal="true"
       aria-label={card.title}
     >
       {/* Image area */}
-      <div className="relative flex-1 flex items-center justify-center min-w-0">
+      <div
+        className="relative flex items-center justify-center min-w-0"
+        style={
+          isMobile
+            ? { width: "100%", height: "52vh", flexShrink: 0 }
+            : { flex: 1 }
+        }
+      >
         {/* Prev arrow */}
         <button
           onClick={goPrev}
@@ -67,7 +88,10 @@ export default function MosaicLightbox({
         </button>
 
         {/* Image */}
-        <div className="relative w-full h-full max-w-[calc(100%-120px)]" style={{ maxHeight: "90vh" }}>
+        <div
+          className="relative w-full h-full"
+          style={{ maxWidth: isMobile ? "100%" : "calc(100% - 120px)", maxHeight: isMobile ? "52vh" : "90vh" }}
+        >
           {card.mediaType === "image" ? (
             <Image
               key={card.id}
@@ -103,14 +127,25 @@ export default function MosaicLightbox({
       {/* Details panel */}
       <div
         className="flex flex-col overflow-y-auto"
-        style={{
-          width: 300,
-          flexShrink: 0,
-          background: "var(--color-surface)",
-          borderLeft: "1px solid var(--color-border)",
-          padding: "48px 28px 28px",
-          position: "relative",
-        }}
+        style={
+          isMobile
+            ? {
+                flex: 1,
+                width: "100%",
+                background: "var(--color-surface)",
+                borderTop: "1px solid var(--color-border)",
+                padding: "40px 24px 24px",
+                position: "relative",
+              }
+            : {
+                width: 300,
+                flexShrink: 0,
+                background: "var(--color-surface)",
+                borderLeft: "1px solid var(--color-border)",
+                padding: "48px 28px 28px",
+                position: "relative",
+              }
+        }
       >
         {/* Close */}
         <button

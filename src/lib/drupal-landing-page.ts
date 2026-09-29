@@ -4,6 +4,7 @@ import type { FeatureSpotData, FeatureSpotPosition, FeatureSpotBgColor } from "@
 import type { SpaceCalendarData } from "@/components/paragraphs/space-calendar";
 import type { DescriptiveContentData } from "@/components/paragraphs/descriptive-content";
 import type { EarthquakeDashboardData, TimeRange } from "@/components/paragraphs/earthquake-dashboard";
+import type { ApodData } from "@/components/paragraphs/apod";
 
 const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
@@ -59,6 +60,12 @@ export type ParagraphEarthquakeDashboard = {
   data: EarthquakeDashboardData;
 };
 
+export type ParagraphApod = {
+  type: "paragraph--apod";
+  id: string;
+  data: ApodData;
+};
+
 export type ParagraphData =
   | ParagraphCarouselHero
   | ParagraphViewEmbed
@@ -67,7 +74,8 @@ export type ParagraphData =
   | ParagraphFeatureSpot
   | ParagraphSpaceCalendar
   | ParagraphDescriptiveContent
-  | ParagraphEarthquakeDashboard;
+  | ParagraphEarthquakeDashboard
+  | ParagraphApod;
 
 // ─── JSON:API helpers ─────────────────────────────────────────────────────────
 
@@ -160,6 +168,8 @@ export async function getNodeComponents(
         return [parseDescriptiveContent(ref.id, included)];
       case "paragraph--earthquake_dashboard":
         return [parseEarthquakeDashboard(ref.id, included)];
+      case "paragraph--apod":
+        return [parseApod(ref.id, included)];
       default: return [];
     }
   });
@@ -493,6 +503,22 @@ function parseEarthquakeDashboard(id: string, included: AnyResource[]): Paragrap
       id,
       heading: para?.attributes.field_eq_label ?? undefined,
       defaultRange,
+    },
+  };
+}
+
+function parseApod(id: string, included: AnyResource[]): ParagraphApod {
+  type ApiApod = AnyResource & {
+    attributes: { field_apod_label: string | null };
+  };
+
+  const para = findIncluded<ApiApod>(included, "paragraph--apod", id);
+  return {
+    type: "paragraph--apod",
+    id,
+    data: {
+      id,
+      heading: para?.attributes.field_apod_label ?? undefined,
     },
   };
 }
