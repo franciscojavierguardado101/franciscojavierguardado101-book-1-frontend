@@ -6,7 +6,8 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // standalone only for Docker/Kubernetes — Vercel manages its own output format
+  output: process.env.VERCEL ? undefined : "standalone",
   async redirects() {
     return [
       {
