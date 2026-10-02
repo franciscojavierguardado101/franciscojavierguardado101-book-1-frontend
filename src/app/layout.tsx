@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 
 const anekTamil = Anek_Tamil({
   subsets: ["latin"],
-  weight: ["400", "600"],
   variable: "--font-anek",
   display: "swap",
 });

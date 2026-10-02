@@ -27,13 +27,13 @@ function getMonthRange(year: number, month: number): { start: string; end: strin
 
 function getEventId(event: SpaceEvent): string {
   return (
-    (event.flrID ?? event.cmeID ?? event.gstID ?? event.sepID ?? "") +
-    (event.beginTime ?? "")
+    (event.flrID ?? event.cmeID ?? event.activityID ?? event.gstID ?? event.sepID ?? "") +
+    (event.beginTime ?? event.startTime ?? "")
   );
 }
 
 function getEventDate(event: SpaceEvent): string {
-  const raw = event.beginTime ?? event.peakTime ?? "";
+  const raw = event.beginTime ?? event.startTime ?? event.peakTime ?? "";
   return raw ? raw.split("T")[0] : "";
 }
 
@@ -80,9 +80,9 @@ function EventCard({ event, type }: { event: SpaceEvent; type: SpaceEventType })
         {label}
       </p>
 
-      {event.beginTime && (
+      {(event.beginTime ?? event.startTime) && (
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-muted)" }}>
-          Begin: {formatTime(event.beginTime)}
+          Begin: {formatTime(event.beginTime ?? event.startTime)}
         </p>
       )}
       {event.peakTime && (
@@ -142,7 +142,7 @@ export default function SpaceCalendar({ heading }: SpaceCalendarProps) {
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState(toISO(today));
-  const [eventType, setEventType] = useState<SpaceEventType>("FLR");
+  const [eventType, setEventType] = useState<SpaceEventType>("CME");
   const [events, setEvents] = useState<SpaceEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

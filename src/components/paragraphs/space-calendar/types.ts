@@ -7,13 +7,19 @@ export const EVENT_TYPE_LABELS: Record<SpaceEventType, string> = {
   SEP: "Solar Energetic Particles",
 };
 
-// Raw shape returned by NASA DONKI — fields vary per event type
+// Raw shape returned by DONKI — fields vary per event type
+// FLR: beginTime/peakTime/endTime
+// CME: startTime (no beginTime)
+// GST: startTime (no beginTime)
+// SEP: beginTime
 export interface SpaceEvent {
   flrID?: string;
   cmeID?: string;
+  activityID?: string;
   gstID?: string;
   sepID?: string;
   beginTime?: string;
+  startTime?: string;
   peakTime?: string;
   endTime?: string;
   classType?: string;
