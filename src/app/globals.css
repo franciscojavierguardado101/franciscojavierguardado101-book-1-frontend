@@ -81,10 +81,14 @@ a {
 .article-rte ul,
 .article-rte ol  { margin-bottom: 1em; padding-left: 1.5em; }
 .article-rte li  { margin-bottom: 0.4em; line-height: 1.7; }
-.article-rte a   { color: var(--article-link-color, var(--color-accent-purple)); text-decoration: underline; }
+.article-rte a   { color: var(--article-link-color, var(--color-accent-purple)); text-decoration: underline; text-underline-offset: 3px; }
 .article-rte a:hover { opacity: 0.8; }
 .article-rte h2,
 .article-rte h3  { margin: 1.5em 0 0.5em; font-family: var(--font-header); }
+
+/* Descriptive content body links */
+.descriptive-content__body a { color: var(--color-accent-purple); text-decoration: underline; text-underline-offset: 3px; }
+.descriptive-content__body a:hover { opacity: 0.8; }
 
 /* ── Article list page ─────────────────────────────── */
 

@@ -7,6 +7,8 @@ import { SpaceCalendar } from "@/components/paragraphs/space-calendar";
 import { DescriptiveContent } from "@/components/paragraphs/descriptive-content";
 import { EarthquakeDashboard } from "@/components/paragraphs/earthquake-dashboard";
 import { ApodDisplay } from "@/components/paragraphs/apod";
+import { IssTracker } from "@/components/paragraphs/iss-tracker";
+import { NasaVideos } from "@/components/paragraphs/nasa-videos";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -38,5 +40,11 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--apod":
       return <ApodDisplay heading={paragraph.data.heading} />;
+
+    case "paragraph--iss_tracker":
+      return <IssTracker heading={paragraph.data.heading} />;
+
+    case "paragraph--nasa_videos":
+      return <NasaVideos heading={paragraph.data.heading} defaultQuery={paragraph.data.defaultQuery} />;
   }
 }

@@ -1,8 +1,10 @@
 const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
 export interface NavItem {
+  id: string;
   label: string;
   href: string;
+  children: NavItem[];
 }
 
 export interface FooterNavItem {
@@ -18,8 +20,6 @@ export interface FooterMenuSection {
 }
 
 export async function getFooterMenu(): Promise<FooterMenuSection[]> {
-  // id is the top-level JSON:API resource id (e.g. "menu_link_content:UUID"),
-  // which is what attributes.parent references for child items.
   interface RawItem {
     id: string;
     attributes: {
@@ -67,6 +67,17 @@ export async function getFooterMenu(): Promise<FooterMenuSection[]> {
 }
 
 export async function getMainMenu(): Promise<NavItem[]> {
+  interface RawItem {
+    id: string;
+    attributes: {
+      title: string;
+      url: string;
+      enabled: boolean;
+      weight: number;
+      parent: string;
+    };
+  }
+
   try {
     const res = await fetch(`${DRUPAL_BASE}/jsonapi/menu_items/main`, {
       headers: { Accept: "application/vnd.api+json" },
@@ -75,16 +86,26 @@ export async function getMainMenu(): Promise<NavItem[]> {
     if (!res.ok) return [];
 
     const json = await res.json();
-    return (json.data ?? [])
-      .filter((item: { attributes: { enabled: boolean } }) => item.attributes.enabled)
-      .sort(
-        (a: { attributes: { weight: number } }, b: { attributes: { weight: number } }) =>
-          a.attributes.weight - b.attributes.weight
-      )
-      .map((item: { attributes: { title: string; url: string } }): NavItem => ({
-        label: item.attributes.title,
-        href: item.attributes.url,
-      }));
+    const all: RawItem[] = (json.data ?? [])
+      .filter((item: RawItem) => item.attributes.enabled)
+      .sort((a: RawItem, b: RawItem) => a.attributes.weight - b.attributes.weight);
+
+    const topLevel = all.filter((item) => !item.attributes.parent);
+    const childItems = all.filter((item) => !!item.attributes.parent);
+
+    return topLevel.map((item): NavItem => ({
+      id: item.id,
+      label: item.attributes.title,
+      href: item.attributes.url,
+      children: childItems
+        .filter((child) => child.attributes.parent === item.id)
+        .map((child): NavItem => ({
+          id: child.id,
+          label: child.attributes.title,
+          href: child.attributes.url,
+          children: [],
+        })),
+    }));
   } catch {
     return [];
   }
