@@ -65,7 +65,7 @@ function AnnotEl({ annot, active, onActivate, onEdit, onRemove, onDragStart }: {
     if (annot.kind !== "text" || !inputRef.current || !mirrorRef.current) return;
     inputRef.current.style.width =
       Math.max(60, mirrorRef.current.offsetWidth + 8) + "px";
-  }, [annot.kind, annot.value, annot.fontSize]);
+  }, [annot.kind, annot.kind === "text" ? annot.value : null, annot.kind === "text" ? annot.fontSize : null]);
 
   return (
     <div
