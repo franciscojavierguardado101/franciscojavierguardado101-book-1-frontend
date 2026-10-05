@@ -9,6 +9,7 @@ import { EarthquakeDashboard } from "@/components/paragraphs/earthquake-dashboar
 import { ApodDisplay } from "@/components/paragraphs/apod";
 import { IssTracker } from "@/components/paragraphs/iss-tracker";
 import { NasaVideos } from "@/components/paragraphs/nasa-videos";
+import PdfEditor from "@/components/paragraphs/pdf-editor";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -46,5 +47,8 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--nasa_videos":
       return <NasaVideos heading={paragraph.data.heading} defaultQuery={paragraph.data.defaultQuery} />;
+
+    case "paragraph--pdf_editor":
+      return <PdfEditor heading={paragraph.data.heading} />;
   }
 }

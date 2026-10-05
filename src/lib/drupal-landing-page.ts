@@ -7,6 +7,7 @@ import type { EarthquakeDashboardData, TimeRange } from "@/components/paragraphs
 import type { ApodData } from "@/components/paragraphs/apod";
 import type { IssTrackerData } from "@/components/paragraphs/iss-tracker";
 import type { NasaVideosData } from "@/components/paragraphs/nasa-videos";
+import type { PdfEditorData } from "@/components/paragraphs/pdf-editor/types";
 
 const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
@@ -80,6 +81,12 @@ export type ParagraphNasaVideos = {
   data: NasaVideosData;
 };
 
+export type ParagraphPdfEditor = {
+  type: "paragraph--pdf_editor";
+  id: string;
+  data: PdfEditorData;
+};
+
 export type ParagraphData =
   | ParagraphCarouselHero
   | ParagraphViewEmbed
@@ -91,7 +98,8 @@ export type ParagraphData =
   | ParagraphEarthquakeDashboard
   | ParagraphApod
   | ParagraphIssTracker
-  | ParagraphNasaVideos;
+  | ParagraphNasaVideos
+  | ParagraphPdfEditor;
 
 // ─── JSON:API helpers ─────────────────────────────────────────────────────────
 
@@ -190,6 +198,8 @@ export async function getNodeComponents(
         return [parseIssTracker(ref.id, included)];
       case "paragraph--nasa_videos":
         return [parseNasaVideos(ref.id, included)];
+      case "paragraph--pdf_editor":
+        return [parsePdfEditor(ref.id, included)];
       default: return [];
     }
   });
@@ -556,6 +566,18 @@ function parseIssTracker(id: string, included: AnyResource[]): ParagraphIssTrack
       id,
       heading: para?.attributes.field_iss_label ?? undefined,
     },
+  };
+}
+
+function parsePdfEditor(id: string, included: AnyResource[]): ParagraphPdfEditor {
+  type ApiPdfEditor = AnyResource & {
+    attributes: { field_pdf_label: string | null };
+  };
+  const para = findIncluded<ApiPdfEditor>(included, "paragraph--pdf_editor", id);
+  return {
+    type: "paragraph--pdf_editor",
+    id,
+    data: { id, heading: para?.attributes.field_pdf_label ?? undefined },
   };
 }
 
