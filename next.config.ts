@@ -37,6 +37,11 @@ const nextConfig: NextConfig = {
         pathname: "/sites/default/files/**",
       },
       {
+        protocol: "http",
+        hostname: "141.148.43.188",
+        pathname: "/sites/default/files/**",
+      },
+      {
         protocol: "https",
         hostname: "assets.science.nasa.gov",
         pathname: "/**",
