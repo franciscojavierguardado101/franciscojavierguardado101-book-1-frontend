@@ -8,6 +8,7 @@ import type { ApodData } from "@/components/paragraphs/apod";
 import type { IssTrackerData } from "@/components/paragraphs/iss-tracker";
 import type { NasaVideosData } from "@/components/paragraphs/nasa-videos";
 import type { PdfEditorData } from "@/components/paragraphs/pdf-editor/types";
+import type { NasaFireballChartData, ChartType } from "@/components/paragraphs/nasa-fireball-chart/types";
 
 const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
@@ -87,6 +88,12 @@ export type ParagraphPdfEditor = {
   data: PdfEditorData;
 };
 
+export type ParagraphNasaFireballChart = {
+  type: "paragraph--nasa_fireball_chart";
+  id: string;
+  data: NasaFireballChartData;
+};
+
 export type ParagraphData =
   | ParagraphCarouselHero
   | ParagraphViewEmbed
@@ -99,7 +106,8 @@ export type ParagraphData =
   | ParagraphApod
   | ParagraphIssTracker
   | ParagraphNasaVideos
-  | ParagraphPdfEditor;
+  | ParagraphPdfEditor
+  | ParagraphNasaFireballChart;
 
 // ─── JSON:API helpers ─────────────────────────────────────────────────────────
 
@@ -200,6 +208,8 @@ export async function getNodeComponents(
         return [parseNasaVideos(ref.id, included)];
       case "paragraph--pdf_editor":
         return [parsePdfEditor(ref.id, included)];
+      case "paragraph--nasa_fireball_chart":
+        return [parseNasaFireballChart(ref.id, included)];
       default: return [];
     }
   });
@@ -597,6 +607,32 @@ function parseNasaVideos(id: string, included: AnyResource[]): ParagraphNasaVide
       id,
       heading: para?.attributes.field_nasa_v_label ?? undefined,
       defaultQuery: para?.attributes.field_nasa_v_query ?? undefined,
+    },
+  };
+}
+
+function parseNasaFireballChart(id: string, included: AnyResource[]): ParagraphNasaFireballChart {
+  type ApiNasaFireballChart = AnyResource & {
+    attributes: {
+      field_chart_label: string | null;
+      field_chart_type: ChartType | null;
+      field_chart_limit: number | null;
+    };
+  };
+
+  const validTypes = new Set<ChartType>(["bar", "line", "scatter"]);
+  const para = findIncluded<ApiNasaFireballChart>(included, "paragraph--nasa_fireball_chart", id);
+  const rawType = para?.attributes.field_chart_type ?? null;
+  const chartType: ChartType = rawType && validTypes.has(rawType) ? rawType : "bar";
+
+  return {
+    type: "paragraph--nasa_fireball_chart",
+    id,
+    data: {
+      id,
+      heading: para?.attributes.field_chart_label ?? undefined,
+      defaultChartType: chartType,
+      limit: para?.attributes.field_chart_limit ?? 25,
     },
   };
 }

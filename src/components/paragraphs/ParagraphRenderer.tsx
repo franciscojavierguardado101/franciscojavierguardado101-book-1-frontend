@@ -10,6 +10,7 @@ import { ApodDisplay } from "@/components/paragraphs/apod";
 import { IssTracker } from "@/components/paragraphs/iss-tracker";
 import { NasaVideos } from "@/components/paragraphs/nasa-videos";
 import PdfEditor from "@/components/paragraphs/pdf-editor";
+import { NasaFireballChart } from "@/components/paragraphs/nasa-fireball-chart";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -50,5 +51,8 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--pdf_editor":
       return <PdfEditor heading={paragraph.data.heading} />;
+
+    case "paragraph--nasa_fireball_chart":
+      return <NasaFireballChart data={paragraph.data} />;
   }
 }
