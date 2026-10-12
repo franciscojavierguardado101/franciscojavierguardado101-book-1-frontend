@@ -198,7 +198,7 @@ export default function NasaFireballChart({ data }: { data: NasaFireballChartDat
         {/* Footer: CSV download link */}
         <div style={{ marginTop: 16, textAlign: "right" }}>
           <a
-            href="/nasa-fireball-data.csv"
+            href="/api/nasa-fireball-csv"
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "0.78rem",
