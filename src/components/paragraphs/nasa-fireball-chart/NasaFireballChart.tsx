@@ -61,7 +61,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
 }
 
 export default function NasaFireballChart({ data }: { data: NasaFireballChartData }) {
-  const { heading, defaultChartType, limit } = data;
+  const { heading, defaultChartType, limit, apiPath, csvPath, source } = data;
 
   const [chartType, setChartType] = useState<ChartType>(defaultChartType);
   const [points, setPoints]       = useState<FireballDataPoint[]>([]);
@@ -71,12 +71,12 @@ export default function NasaFireballChart({ data }: { data: NasaFireballChartDat
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/nasa-fireball-chart?limit=${limit}&chart_type=${chartType}`)
+    fetch(`${apiPath}?limit=${limit}&chart_type=${chartType}`)
       .then((r) => r.json())
       .then((json: ChartApiResponse) => setPoints(json.data ?? []))
       .catch(() => setError("Failed to load chart data."))
       .finally(() => setLoading(false));
-  }, [chartType, limit]);
+  }, [chartType, limit, apiPath]);
 
   const tickStyle = {
     fontFamily: "var(--font-body, monospace)",
@@ -104,7 +104,7 @@ export default function NasaFireballChart({ data }: { data: NasaFireballChartDat
               </h2>
             )}
             <p style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", color: "rgba(255,255,255,0.35)", margin: 0 }}>
-              Source: NASA/JPL CNEOS Fireball API &nbsp;·&nbsp; {points.length} events
+              Source: {source} &nbsp;·&nbsp; {points.length} events
             </p>
           </div>
 
@@ -198,7 +198,7 @@ export default function NasaFireballChart({ data }: { data: NasaFireballChartDat
         {/* Footer: CSV download link */}
         <div style={{ marginTop: 16, textAlign: "right" }}>
           <a
-            href="/api/nasa-fireball-csv"
+            href={csvPath}
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "0.78rem",

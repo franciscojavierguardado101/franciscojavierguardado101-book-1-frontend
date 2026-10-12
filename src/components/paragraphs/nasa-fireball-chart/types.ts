@@ -22,4 +22,7 @@ export interface NasaFireballChartData {
   heading?: string;
   defaultChartType: ChartType;
   limit: number;
+  apiPath: string;
+  csvPath: string;
+  source: string;
 }

@@ -617,6 +617,9 @@ function parseNasaFireballChart(id: string, included: AnyResource[]): ParagraphN
       field_chart_label: string | null;
       field_chart_type: ChartType | null;
       field_chart_limit: number | null;
+      field_chart_api_path: string | null;
+      field_chart_csv_path: string | null;
+      field_chart_source: string | null;
     };
   };
 
@@ -630,9 +633,12 @@ function parseNasaFireballChart(id: string, included: AnyResource[]): ParagraphN
     id,
     data: {
       id,
-      heading: para?.attributes.field_chart_label ?? undefined,
+      heading:          para?.attributes.field_chart_label    ?? undefined,
       defaultChartType: chartType,
-      limit: para?.attributes.field_chart_limit ?? 25,
+      limit:            para?.attributes.field_chart_limit    ?? 25,
+      apiPath:          para?.attributes.field_chart_api_path ?? "/api/nasa-fireball-chart",
+      csvPath:          para?.attributes.field_chart_csv_path ?? "/api/nasa-fireball-csv",
+      source:           para?.attributes.field_chart_source   ?? "NASA/JPL CNEOS Fireball API",
     },
   };
 }
