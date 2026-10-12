@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const DRUPAL_BASE = process.env.NEXT_PUBLIC_DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
+const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
