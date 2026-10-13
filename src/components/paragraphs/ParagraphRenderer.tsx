@@ -11,6 +11,7 @@ import { IssTracker } from "@/components/paragraphs/iss-tracker";
 import { NasaVideos } from "@/components/paragraphs/nasa-videos";
 import PdfEditor from "@/components/paragraphs/pdf-editor";
 import { NasaFireballChart } from "@/components/paragraphs/nasa-fireball-chart";
+import { DataGovChart } from "@/components/paragraphs/datagov-chart";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -54,5 +55,8 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--nasa_fireball_chart":
       return <NasaFireballChart data={paragraph.data} />;
+
+    case "paragraph--datagov_chart":
+      return <DataGovChart data={paragraph.data} />;
   }
 }
