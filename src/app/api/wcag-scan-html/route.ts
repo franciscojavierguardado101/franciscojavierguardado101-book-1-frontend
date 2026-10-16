@@ -66,7 +66,8 @@ export async function POST(req: NextRequest) {
   let browser;
   try {
     browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage();
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     await page.setContent(document, { waitUntil: "domcontentloaded" });
 
