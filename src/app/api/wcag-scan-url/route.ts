@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       timestamp: new Date().toISOString(),
       violations:   results.violations,
       incomplete:   results.incomplete,
-      passes:       results.passes.length,
+      passes:       results.passes,
       inapplicable: results.inapplicable.length,
       testEngine:   results.testEngine,
     });

@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       hasCss: !!css,
       violations:   results.violations,
       incomplete:   results.incomplete,
-      passes:       results.passes.length,
+      passes:       results.passes,
       inapplicable: results.inapplicable.length,
       testEngine:   results.testEngine,
     });

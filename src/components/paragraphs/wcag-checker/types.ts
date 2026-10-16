@@ -24,7 +24,7 @@ export interface ScanResponse {
   hasCss?: boolean;
   violations: AuditResult[];
   incomplete: AuditResult[];
-  passes: number;
+  passes: AuditResult[];
   inapplicable: number;
   testEngine?: { name: string; version: string };
   error?: string;

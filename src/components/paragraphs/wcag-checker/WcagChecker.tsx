@@ -50,7 +50,7 @@ function downloadJson(results: ScanResponse) {
 
 function downloadCsv(results: ScanResponse) {
   const rows = [
-    ["Type", "Rule ID", "Impact", "WCAG Criteria", "Description", "Affected Elements", "Fix"],
+    ["Type", "Rule ID", "Impact", "WCAG Criteria", "Description", "Affected Elements", "Docs"],
     ...results.violations.map((v) => [
       "Violation",
       v.id,
@@ -64,6 +64,15 @@ function downloadCsv(results: ScanResponse) {
       "Needs Manual Review",
       v.id,
       v.impact ?? "unknown",
+      wcagId(v.tags),
+      v.help,
+      v.nodes.length.toString(),
+      v.helpUrl,
+    ]),
+    ...results.passes.map((v) => [
+      "Pass",
+      v.id,
+      "",
       wcagId(v.tags),
       v.help,
       v.nodes.length.toString(),
@@ -218,7 +227,7 @@ function SummaryBar({
 }: {
   violations: AuditResult[];
   incomplete: AuditResult[];
-  passes: number;
+  passes: AuditResult[];
 }) {
   const counts = { critical: 0, serious: 0, moderate: 0, minor: 0 };
   for (const v of violations) {
@@ -274,8 +283,99 @@ function SummaryBar({
         fontSize: "0.8rem", fontWeight: 600,
         color: "#22c55e",
       }}>
-        {passes} passed
+        {passes.length} passed
       </span>
+    </div>
+  );
+}
+
+function PassedRulesList({ passes }: { passes: AuditResult[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{ marginBottom: 32 }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          marginBottom: open ? 12 : 0,
+        }}
+      >
+        <h4 style={{
+          fontFamily: "var(--font-body)",
+          fontSize: "0.72rem",
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: "#22c55e",
+          margin: 0,
+        }}>
+          Passed Rules ({passes.length})
+        </h4>
+        <span style={{ fontSize: "0.72rem", color: "#22c55e", opacity: 0.7 }}>
+          {open ? "▲ hide" : "▼ show"}
+        </span>
+      </button>
+
+      {open && (
+        <div style={{
+          background: SURFACE,
+          border: "1px solid rgba(34,197,94,0.15)",
+          borderRadius: 6,
+          overflow: "hidden",
+        }}>
+          {passes.map((rule, i) => (
+            <div
+              key={rule.id}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 12,
+                padding: "10px 16px",
+                borderBottom: i < passes.length - 1 ? `1px solid ${BORDER}` : "none",
+              }}
+            >
+              <span style={{ color: "#22c55e", fontSize: "0.85rem", flexShrink: 0, marginTop: 1 }}>✓</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 2 }}>
+                  <code style={{ color: "#4ade80", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                    {rule.id}
+                  </code>
+                  {wcagId(rule.tags) && (
+                    <span style={{ fontSize: "0.68rem", color: MUTED, fontFamily: "monospace" }}>
+                      {wcagId(rule.tags)}
+                    </span>
+                  )}
+                </div>
+                <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(255,255,255,0.6)" }}>
+                  {rule.help}
+                </p>
+              </div>
+              <a
+                href={rule.helpUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: "0.68rem",
+                  color: MUTED,
+                  textDecoration: "none",
+                  flexShrink: 0,
+                  marginTop: 2,
+                  opacity: 0.6,
+                }}
+                title="WCAG docs"
+              >
+                ↗
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -609,6 +709,11 @@ export default function WcagChecker({ data }: { data: WcagCheckerData }) {
               }}>
                 No automated violations found.
               </div>
+            )}
+
+            {/* Passed rules */}
+            {results.passes.length > 0 && (
+              <PassedRulesList passes={results.passes} />
             )}
 
             {/* Incomplete / needs manual review */}
