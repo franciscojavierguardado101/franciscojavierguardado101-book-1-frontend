@@ -25,17 +25,27 @@ function buildDocument(html: string, css?: string): string {
     return trimmed;
   }
 
-  // Wrap fragment in a minimal, semantically valid document
+  // Wrap fragment in a semantically complete document so document-level
+  // axe rules (landmark-one-main, page-has-heading-one, region) don't fire
+  // as false positives against the fragment's surrounding shell.
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WCAG Fragment Audit</title>
+  <style>
+    .audit-skip-link { position: absolute; left: -9999px; }
+    .audit-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+  </style>
   ${styleTag}
 </head>
 <body>
-${html}
+  <a class="audit-skip-link" href="#audit-main">Skip to content</a>
+  <main id="audit-main">
+    <h1 class="audit-heading">Fragment Audit</h1>
+    ${html}
+  </main>
 </body>
 </html>`;
 }
