@@ -8,6 +8,8 @@ if (process.env.NODE_ENV !== "production") {
 const nextConfig: NextConfig = {
   // standalone only for Docker/Kubernetes — Vercel manages its own output format
   output: process.env.VERCEL ? undefined : "standalone",
+  // Playwright has native binaries — must not be bundled by webpack
+  serverExternalPackages: ["playwright", "playwright-core", "@axe-core/playwright"],
   async redirects() {
     return [
       {

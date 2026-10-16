@@ -12,6 +12,7 @@ import { NasaVideos } from "@/components/paragraphs/nasa-videos";
 import PdfEditor from "@/components/paragraphs/pdf-editor";
 import { NasaFireballChart } from "@/components/paragraphs/nasa-fireball-chart";
 import { DataGovChart } from "@/components/paragraphs/datagov-chart";
+import { WcagChecker } from "@/components/paragraphs/wcag-checker";
 
 export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphData }) {
   switch (paragraph.type) {
@@ -58,5 +59,8 @@ export default function ParagraphRenderer({ paragraph }: { paragraph: ParagraphD
 
     case "paragraph--datagov_chart":
       return <DataGovChart data={paragraph.data} />;
+
+    case "paragraph--wcag_checker":
+      return <WcagChecker data={paragraph.data} />;
   }
 }

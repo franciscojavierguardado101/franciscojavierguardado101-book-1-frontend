@@ -10,6 +10,7 @@ import type { NasaVideosData } from "@/components/paragraphs/nasa-videos";
 import type { PdfEditorData } from "@/components/paragraphs/pdf-editor/types";
 import type { NasaFireballChartData, ChartType } from "@/components/paragraphs/nasa-fireball-chart/types";
 import type { DataGovChartData, ChartType as DataGovChartType } from "@/components/paragraphs/datagov-chart/types";
+import type { WcagCheckerData } from "@/components/paragraphs/wcag-checker/types";
 
 const DRUPAL_BASE = process.env.DRUPAL_BASE_URL ?? "https://francisco-guardado-book-1.ddev.site:33300";
 
@@ -101,6 +102,12 @@ export type ParagraphDataGovChart = {
   data: DataGovChartData;
 };
 
+export type ParagraphWcagChecker = {
+  type: "paragraph--wcag_checker";
+  id: string;
+  data: WcagCheckerData;
+};
+
 export type ParagraphData =
   | ParagraphCarouselHero
   | ParagraphViewEmbed
@@ -115,7 +122,8 @@ export type ParagraphData =
   | ParagraphNasaVideos
   | ParagraphPdfEditor
   | ParagraphNasaFireballChart
-  | ParagraphDataGovChart;
+  | ParagraphDataGovChart
+  | ParagraphWcagChecker;
 
 // ─── JSON:API helpers ─────────────────────────────────────────────────────────
 
@@ -220,6 +228,8 @@ export async function getNodeComponents(
         return [parseNasaFireballChart(ref.id, included)];
       case "paragraph--datagov_chart":
         return [parseDataGovChart(ref.id, included)];
+      case "paragraph--wcag_checker":
+        return [parseWcagChecker(ref.id, included)];
       default: return [];
     }
   });
@@ -649,6 +659,22 @@ function parseNasaFireballChart(id: string, included: AnyResource[]): ParagraphN
       apiPath:          para?.attributes.field_chart_api_path ?? "/api/nasa-fireball-chart",
       csvPath:          para?.attributes.field_chart_csv_path ?? "/api/nasa-fireball-csv",
       source:           para?.attributes.field_chart_source   ?? "NASA/JPL CNEOS Fireball API",
+    },
+  };
+}
+
+function parseWcagChecker(id: string, included: AnyResource[]): ParagraphWcagChecker {
+  type ApiWcagChecker = AnyResource & {
+    attributes: { field_wcag_label: string | null };
+  };
+
+  const para = findIncluded<ApiWcagChecker>(included, "paragraph--wcag_checker", id);
+  return {
+    type: "paragraph--wcag_checker",
+    id,
+    data: {
+      id,
+      heading: para?.attributes.field_wcag_label ?? undefined,
     },
   };
 }
