@@ -3,6 +3,7 @@ import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 
 export const maxDuration = 60;
+process.env.PLAYWRIGHT_BROWSERS_PATH ??= "0";
 
 const BLOCKED_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1", "0.0.0.0"]);
 const PRIVATE_IP = /^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|169\.254\.|fc00:|fe80:)/i;

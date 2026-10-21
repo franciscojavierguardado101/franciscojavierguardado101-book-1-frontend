@@ -3,6 +3,7 @@ import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 
 export const maxDuration = 60;
+process.env.PLAYWRIGHT_BROWSERS_PATH ??= "0";
 
 const MAX_HTML_BYTES = 500_000; // 500 KB
 
