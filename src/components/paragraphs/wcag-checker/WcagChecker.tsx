@@ -423,7 +423,7 @@ export default function WcagChecker({ data }: { data: WcagCheckerData }) {
         throw new Error(
           res.ok
             ? "Scan returned an invalid response — the page may be too large."
-            : `HTTP ${res.status} — scan timed out or failed. Try a smaller page.`
+            : `Scan failed (HTTP ${res.status}). ${text.slice(0, 200) || "No details from server."}`
         );
       }
       if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);

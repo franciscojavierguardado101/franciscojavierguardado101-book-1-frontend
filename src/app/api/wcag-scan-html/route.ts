@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { chromium } from "playwright";
+import { chromium } from "playwright-core";
 import AxeBuilder from "@axe-core/playwright";
 
 export const maxDuration = 60;
-process.env.PLAYWRIGHT_BROWSERS_PATH ??= "0";
 
 const MAX_HTML_BYTES = 500_000; // 500 KB
 
@@ -16,7 +15,6 @@ function buildDocument(html: string, css?: string): string {
   const styleTag = css ? `<style>${css}</style>` : "";
 
   if (isFullDocument) {
-    // Inject CSS before </head> if present, otherwise before </body>
     if (css) {
       if (/<\/head>/i.test(trimmed)) {
         return trimmed.replace(/<\/head>/i, `${styleTag}</head>`);
@@ -76,7 +74,21 @@ export async function POST(req: NextRequest) {
 
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
+    // On Vercel use @sparticuz/chromium (serverless-optimised binary).
+    // On Docker/OKE the PLAYWRIGHT_BROWSERS_PATH env var points to pre-installed browsers.
+    let executablePath: string | undefined;
+    let launchArgs: string[] = [];
+    if (process.env.VERCEL) {
+      const sparticuz = (await import("@sparticuz/chromium")).default;
+      executablePath = await sparticuz.executablePath();
+      launchArgs = sparticuz.args;
+    }
+
+    browser = await chromium.launch({
+      headless: true,
+      executablePath,
+      args: launchArgs,
+    });
     const context = await browser.newContext();
     const page = await context.newPage();
 

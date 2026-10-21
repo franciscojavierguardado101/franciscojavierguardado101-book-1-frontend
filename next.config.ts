@@ -9,7 +9,13 @@ const nextConfig: NextConfig = {
   // standalone only for Docker/Kubernetes — Vercel manages its own output format
   output: process.env.VERCEL ? undefined : "standalone",
   // Playwright has native binaries — must not be bundled by webpack
-  serverExternalPackages: ["playwright", "playwright-core", "@axe-core/playwright"],
+  serverExternalPackages: ["playwright", "playwright-core", "@axe-core/playwright", "@sparticuz/chromium"],
+  // Force all playwright-core files (including browsers.json) into the function bundle —
+  // Vercel's file tracer drops non-JS files from external packages by default
+  outputFileTracingIncludes: {
+    "/api/wcag-scan-url":  ["./node_modules/playwright-core/**/*"],
+    "/api/wcag-scan-html": ["./node_modules/playwright-core/**/*"],
+  },
   async redirects() {
     return [
       {

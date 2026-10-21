@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { chromium } from "playwright";
+import { chromium } from "playwright-core";
 import AxeBuilder from "@axe-core/playwright";
 
 export const maxDuration = 60;
-process.env.PLAYWRIGHT_BROWSERS_PATH ??= "0";
 
 const BLOCKED_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1", "0.0.0.0"]);
 const PRIVATE_IP = /^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|169\.254\.|fc00:|fe80:)/i;
@@ -47,7 +46,21 @@ export async function POST(req: NextRequest) {
 
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
+    // On Vercel use @sparticuz/chromium (serverless-optimised binary).
+    // On Docker/OKE the PLAYWRIGHT_BROWSERS_PATH env var points to pre-installed browsers.
+    let executablePath: string | undefined;
+    let launchArgs: string[] = [];
+    if (process.env.VERCEL) {
+      const sparticuz = (await import("@sparticuz/chromium")).default;
+      executablePath = await sparticuz.executablePath();
+      launchArgs = sparticuz.args;
+    }
+
+    browser = await chromium.launch({
+      headless: true,
+      executablePath,
+      args: launchArgs,
+    });
     const context = await browser.newContext({
       userAgent:
         "Mozilla/5.0 (compatible; WCAG-Checker/1.0; +https://franciscojavierguardado.com)",
