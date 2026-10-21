@@ -415,7 +415,17 @@ export default function WcagChecker({ data }: { data: WcagCheckerData }) {
         body: JSON.stringify(body),
       });
 
-      const data: ScanResponse = await res.json();
+      const text = await res.text();
+      let data: ScanResponse;
+      try {
+        data = JSON.parse(text) as ScanResponse;
+      } catch {
+        throw new Error(
+          res.ok
+            ? "Scan returned an invalid response — the page may be too large."
+            : `HTTP ${res.status} — scan timed out or failed. Try a smaller page.`
+        );
+      }
       if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
       setResults(data);
     } catch (e) {

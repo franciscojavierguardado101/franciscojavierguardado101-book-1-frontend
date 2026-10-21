@@ -99,7 +99,9 @@ export async function POST(req: NextRequest) {
       hasCss: !!css,
       violations:   results.violations,
       incomplete:   results.incomplete,
-      passes:       results.passes,
+      passes:       results.passes.map(({ id, impact, description, help, helpUrl, tags }) => ({
+        id, impact, description, help, helpUrl, tags, nodes: [],
+      })),
       inapplicable: results.inapplicable.length,
       testEngine:   results.testEngine,
     });
