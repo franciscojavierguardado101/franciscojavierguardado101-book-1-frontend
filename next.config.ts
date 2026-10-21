@@ -13,8 +13,14 @@ const nextConfig: NextConfig = {
   // Force all playwright-core files (including browsers.json) into the function bundle —
   // Vercel's file tracer drops non-JS files from external packages by default
   outputFileTracingIncludes: {
-    "/api/wcag-scan-url":  ["./node_modules/playwright-core/**/*"],
-    "/api/wcag-scan-html": ["./node_modules/playwright-core/**/*"],
+    "/api/wcag-scan-url":  [
+      "./node_modules/playwright-core/**/*",
+      "./node_modules/@sparticuz/chromium/**/*",
+    ],
+    "/api/wcag-scan-html": [
+      "./node_modules/playwright-core/**/*",
+      "./node_modules/@sparticuz/chromium/**/*",
+    ],
   },
   async redirects() {
     return [
